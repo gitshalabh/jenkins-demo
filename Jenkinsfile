@@ -3,6 +3,7 @@ pipeline {
 
     parameters {
         string(name: 'FILENAME', defaultValue: 'learn.txt', description: 'Enter file name to read')
+        choice(name: 'ENV', choices: ['dev','qa','prod'], description: 'Select environment')
     }
 
     stages {
@@ -17,6 +18,7 @@ pipeline {
         stage('Read File From Parameter') {
             steps {
                 bat "type %FILENAME%"
+                echo %ENV%
             }
         }
 
