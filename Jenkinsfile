@@ -7,11 +7,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repo') {
-            steps {
-                git branch: 'main', url: 'https://github.com/gitshalabh/jenkins-demo.git'
-            }
-        }
 
         stage('List Files') {
             steps {
