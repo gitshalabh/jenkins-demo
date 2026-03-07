@@ -18,7 +18,7 @@ pipeline {
         stage('Read File From Parameter') {
             steps {
                 bat "type %FILENAME%"
-                echo %ENV%
+                echo "${params.ENV}"
             }
         }
 
