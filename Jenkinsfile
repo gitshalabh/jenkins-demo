@@ -2,23 +2,30 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'FILENAME', defaultValue: 'learn.txt', description: 'Enter file name to read')
+        string(name: 'FILENAME', defaultValue: 'learn.txt', description: 'Enter file name')
         choice(name: 'ENV', choices: ['dev','qa','prod'], description: 'Select environment')
     }
 
     stages {
-
-
-        stage('List Files') {
+        stage('Read File') {
             steps {
-                bat 'dir'
+                bat "type %FILENAME%"
             }
         }
 
-        stage('Read File From Parameter') {
+        stage('Environment Logic') {
             steps {
-                bat "type %FILENAME%"
-                echo "${params.ENV}"
+                script {
+                    if (params.ENV == 'dev') {
+                        echo "Deploying to DEV environment"
+                    }
+                    else if (params.ENV == 'qa') {
+                        echo "Deploying to QA environment"
+                    }
+                    else {
+                        echo "Deploying to PROD environment"
+                    }
+                }
             }
         }
 
