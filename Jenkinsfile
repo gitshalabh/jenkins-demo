@@ -2,30 +2,53 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'FILENAME', defaultValue: 'learn.txt', description: 'Enter file name')
-        choice(name: 'ENV', choices: ['dev','qa','prod'], description: 'Select environment')
+        string(name: 'IMAGE_NAME', 
+               defaultValue: 'acidaes/businessnext-diagnostictools:1.0.2-cache',
+               description: 'Enter full image name')
     }
 
     stages {
-        stage('Read File') {
+
+        stage('Clone Repo') {
             steps {
-                bat "type %FILENAME%"
+                git branch: 'main', url: 'https://github.com/gitshalabh/jenkins-demo.git'
             }
         }
 
-        stage('Environment Logic') {
+        stage('Show YAML Before') {
             steps {
-                script {
-                    if (params.ENV == 'dev') {
-                        echo "Deploying to DEV environment"
-                    }
-                    else if (params.ENV == 'qa') {
-                        echo "Deploying to QA environment"
-                    }
-                    else {
-                        echo "Deploying to PROD environment"
-                    }
-                }
+                bat 'type cache-diagnostic-job.yaml'
+            }
+        }
+
+        stage('Update Image') {
+            steps {
+                bat '''
+                powershell -Command "(Get-Content cache-diagnostic-job.yaml) -replace 'image: .*','image: %IMAGE_NAME%' | Set-Content cache-diagnostic-job.yaml"
+                '''
+            }
+        }
+
+        stage('Show YAML After') {
+            steps {
+                bat 'type cache-diagnostic-job.yaml'
+            }
+        }
+
+        stage('Commit Changes') {
+            steps {
+                bat '''
+                git config user.email "shalabhtyagi3@gmail.com"
+                git config user.name "gitshalabh"
+                git add cache-diagnostic-job.yaml
+                git commit -m "Updated image via Jenkins pipeline"
+                '''
+            }
+        }
+
+        stage('Push Changes') {
+            steps {
+                bat 'git push origin main'
             }
         }
 
