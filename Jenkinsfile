@@ -2,16 +2,21 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'IMAGE_NAME', 
+        string(name: 'IMAGE_NAME',
                defaultValue: 'acidaes/businessnext-diagnostictools:1.0.2-cache',
                description: 'Enter full image name')
+    }
+
+    options {
+        timeout(time: 10, unit: 'MINUTES')
     }
 
     stages {
 
         stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/gitshalabh/jenkins-demo.git'
+                git branch: 'main',
+                    url: 'https://github.com/gitshalabh/jenkins-demo.git'
             }
         }
 
@@ -41,14 +46,24 @@ pipeline {
                 git config user.email "shalabhtyagi3@gmail.com"
                 git config user.name "gitshalabh"
                 git add cache-diagnostic-job.yaml
-                git commit -m "Updated image via Jenkins pipeline"
+                git commit -m "Updated image via Jenkins pipeline" || echo No changes to commit
                 '''
             }
         }
 
         stage('Push Changes') {
             steps {
-                bat 'git push origin main'
+                withCredentials([usernamePassword(
+                    credentialsId: 'github-token',
+                    usernameVariable: 'GIT_USER',
+                    passwordVariable: 'GIT_TOKEN'
+                )]) {
+
+                    bat '''
+                    git remote set-url origin https://%GIT_USER%:%GIT_TOKEN%@github.com/gitshalabh/jenkins-demo.git
+                    git push origin main
+                    '''
+                }
             }
         }
 
