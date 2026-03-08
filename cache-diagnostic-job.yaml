@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cache-diagnostic-job
+  namespace: gold8-postgres
+  labels:
+    app: cache-diagnostic
+spec:
+  backoffLimit: 0 
+  template:
+    metadata:
+      labels:
+        app: cache-diagnostic
+    spec:
+      restartPolicy: Never 
+
+      imagePullSecrets:
+        - name: pe-dockerhub-secret
+
+      # nodeSelector:
+      #   SqlNode: "true"
+
+      # tolerations:
+      #   - key: SqlNode
+      #     operator: Equal
+      #     value: "true"
+      #     effect: NoSchedule
+
+      containers:
+        - name: cache-diagnostic
+          image: acidaes/businessnext-diagnostictools:1.0.2-cache
+          imagePullPolicy: IfNotPresent
+
+          envFrom:
+            - configMapRef:
+                name: redis-caching-config
+            - configMapRef:
+                name: cache-diagnostic-config
+
+          volumeMounts:
+            - name: diagnostic-volume
+              mountPath: /export     
+            - name: diagnostic-volume
+              mountPath: /logs
+
+      volumes:
+        - name: diagnostic-volume
+          persistentVolumeClaim:
+            claimName: cache-diagnostic-pvc
