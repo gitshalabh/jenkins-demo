@@ -5,6 +5,9 @@ pipeline {
         string(name: 'IMAGE_NAME',
                defaultValue: 'acidaes/businessnext-diagnostictools:1.0.2-cache',
                description: 'Enter full image name')
+        choice(name: 'NAMESPACE',
+           choices: ['cp1-sql','cps2-sql','cps3-sql'],
+           description: 'Select namespace')
     }
 
     options {
