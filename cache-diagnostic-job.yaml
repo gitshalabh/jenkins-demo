@@ -28,7 +28,7 @@ spec:
 
       containers:
         - name: cache-diagnostic
-          image: acidaes/businessnext-diagnostictools:1.0.2-cache
+          image: acidaes/businessnext-diagnostictools:1.0.9-cache
           imagePullPolicy: IfNotPresent
 
           envFrom:
